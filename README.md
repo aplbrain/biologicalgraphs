@@ -12,6 +12,7 @@ This code requires the C++ Graph library from Bjoern Andres: http://www.andres.s
 git clone https://github.com/Rhoana/biologicalgraphs.git .
 cd biologicalgraphs
 conda create -n biographs_env python=2.7
+source activate biographs_env
 conda install --file requirements.txt
 ````
 
