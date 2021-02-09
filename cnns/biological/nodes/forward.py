@@ -23,7 +23,7 @@ from biologicalgraphs.evaluation import comparestacks
 def NodeGenerator(examples, width):
     index = 0
 
-    while True:             
+    while True:
         # prevent overflow of the queue (these examples will not go through)
         if index == examples.shape[0]: index = 0
 
@@ -32,7 +32,7 @@ def NodeGenerator(examples, width):
 
         # update the index
         index += 1
-        
+
         yield example
 
 
@@ -40,23 +40,23 @@ def NodeGenerator(examples, width):
 def CollectExamples(prefix, width, radius, subset):
     # get the parent directory with all of the featuers
     parent_directory = 'features/biological/nodes-{}nm-{}x{}x{}'.format(radius, width[IB_Z+1], width[IB_Y+1], width[IB_X+1])
-    
+
     positive_filename = '{}/{}/positives/{}-examples.h5'.format(parent_directory, subset, prefix)
     if os.path.exists(positive_filename):
         positive_examples = dataIO.ReadH5File(positive_filename, 'main')
     else:
         positive_examples = np.zeros((0, width[IB_Z + 1], width[IB_Y + 1], width[IB_X + 1]))
-    
+
     negative_filename = '{}/{}/negatives/{}-examples.h5'.format(parent_directory, subset, prefix)
     if os.path.exists(negative_filename):
         negative_examples = dataIO.ReadH5File(negative_filename, 'main')
     else:
         negative_examples = np.zeros((0, width[IB_Z + 1], width[IB_Y + 1], width[IB_X + 1]))
-    
+
     unknowns_filename = '{}/{}/unknowns/{}-examples.h5'.format(parent_directory, subset, prefix)
     if os.path.exists(unknowns_filename):
         unknowns_examples = dataIO.ReadH5File(unknowns_filename, 'main')
-    else: 
+    else:
         unknowns_examples = np.zeros((0, width[IB_Z + 1], width[IB_Y + 1], width[IB_X + 1]))
 
     # concatenate all of the examples together
@@ -85,7 +85,7 @@ def CollectExamples(prefix, width, radius, subset):
 def CollectLargeSmallPairs(prefix, width, radius, subset):
     # get the parent directory with all of the featuers
     parent_directory = 'features/biological/nodes-{}nm-{}x{}x{}'.format(radius, width[IB_Z+1], width[IB_Y+1], width[IB_X+1])
-    
+
     examples = []
 
     positive_filename = '{}/{}/positives/{}.examples'.format(parent_directory, subset, prefix)
@@ -147,26 +147,26 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
     width = (3, 20, 60, 60)
     radius = 400
     threshold_volume = 10368000
-    
+
     # read in the trained model
     model = model_from_json(open('{}.json'.format(model_prefix), 'r').read())
     model.load_weights('{}-best-loss.h5'.format(model_prefix))
 
     # get all of the examples
     examples, npositives, nnegatives = CollectExamples(prefix, width, radius, subset)
-    
+
     # get all of the large-small pairings
     pairings = CollectLargeSmallPairs(prefix, width, radius, subset)
     #assert (len(pairings) == examples.shape[0])
-    
+
     # get the threshold in terms of number of voxels
     resolution = dataIO.Resolution(prefix)
     threshold = int(threshold_volume / (resolution[IB_Z] * resolution[IB_Y] * resolution[IB_X]))
 
     # get the list of nodes over and under the threshold
     small_segments, large_segments = FindSmallSegments(segmentation, threshold)
- 
-    # get all of the probabilities 
+
+    # get all of the probabilities
     probabilities = model.predict_generator(NodeGenerator(examples, width), examples.shape[0], max_q_size=1000)
 
     # save the probabilities to a file
@@ -180,16 +180,16 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
     ground_truth = np.zeros(npositives + nnegatives, dtype=np.bool)
     for iv in range(npositives):
         ground_truth[iv] = True
-    
+
     # get the results with labeled data
     predictions = Prob2Pred(np.squeeze(probabilities[:npositives+nnegatives]))
-    
+
     # print the confusion matrix
     if not seg2gold_mapping is None:
         output_filename = '{}-{}-inference.txt'.format(model_prefix, prefix)
         PrecisionAndRecall(ground_truth, predictions, output_filename)
-        
-    # create a mapping 
+
+    # create a mapping
     small_segment_predictions = dict()
     for small_segment in small_segments:
         small_segment_predictions[small_segment] = set()
@@ -206,7 +206,7 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
         else:
             small_segment = label_two
             large_segment = label_one
-            
+
         small_segment_predictions[small_segment].add((large_segment, probability[0]))
 
     # begin to map the small labels
@@ -227,7 +227,7 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
             if probability > best_probability:
                 best_probability = probability
                 best_large_segment = large_segment
-        
+
         # this should almost never happen but if it does just continue
         if best_large_segment == -1 or best_probability < 0.5:
             mapping[small_segment] = small_segment
@@ -244,15 +244,15 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
             else: nincorrect_merges += 1
 
     if not seg2gold_mapping is None:
-        print '\nResults:'
-        print '  Correctly Merged: {}'.format(ncorrect_merges)
-        print '  Incorrectly Merged: {}'.format(nincorrect_merges)
-        
+        print ('\nResults:')
+        print ('  Correctly Merged: {}'.format(ncorrect_merges))
+        print ('  Incorrectly Merged: {}'.format(nincorrect_merges))
+
         with open(output_filename, 'a') as fd:
             fd.write('\nResults:\n')
             fd.write('  Correctly Merged: {}\n'.format(ncorrect_merges))
             fd.write('  Incorrectly Merged: {}\n'.format(nincorrect_merges))
-        
+
     # save the node mapping in the cache for later
     end2end_mapping = [mapping[iv] for iv in range(max_label)]
 
@@ -266,7 +266,7 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
     # update the end to end mapping with the reduced labels
     for iv in range(max_label):
         end2end_mapping[iv] = mapping[end2end_mapping[iv]]
-    
+
     # get the model name (first component is architecture and third is node-)
     model_name = model_prefix.split('/')[1]
     segmentation_filename = 'segmentations/{}-reduced-{}.h5'.format(prefix, model_name)
@@ -274,7 +274,7 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
 
     # spawn a new meta file
     dataIO.SpawnMetaFile(prefix, segmentation_filename, 'main')
-    
+
     # save the end to end mapping in the cache
     if not os.path.exists('cache'): os.mkdir('cache')
     mapping_filename = 'cache/{}-reduced-{}-end2end.map'.format(prefix, model_name)

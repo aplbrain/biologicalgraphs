@@ -25,7 +25,7 @@ def ExtractAdjacencyMatrix(segmentation):
     zdiff = segmentation[1:,:,:] != segmentation[:-1,:,:]
 
     adjacency_graph = set()
-    
+
     for iz in range(zres):
         for iy in range(yres):
             for ix in range(xres):
@@ -44,7 +44,7 @@ def ExtractAdjacencyMatrix(segmentation):
         else: corrected_adjacency_graph.add((label_one, label_two))
 
     return corrected_adjacency_graph
-    
+
 
 
 def BaselineGraph(prefix, segmentation, seg2gold_mapping):
@@ -63,10 +63,10 @@ def BaselineGraph(prefix, segmentation, seg2gold_mapping):
         elif gold_one == gold_two: positive_candidates.append((label_one, label_two))
         else: negative_candidates.append((label_one, label_two))
 
-    print 'Baseline Adjacency Graph Results'
-    print '  Number positive edges {}'.format(len(positive_candidates))
-    print '  Number negative edges {}'.format(len(negative_candidates))
-    print '  Number unknowns edges {}'.format(len(unknown_candidates))
+    print ('Baseline Adjacency Graph Results')
+    print ('  Number positive edges {}'.format(len(positive_candidates)))
+    print ('  Number negative edges {}'.format(len(negative_candidates)))
+    print ('  Number unknowns edges {}'.format(len(unknown_candidates)))
 
     baseline_filename = 'edge-baselines/{}-edge-baselines.txt'.format(prefix)
     with open(baseline_filename, 'w') as fd:
@@ -79,13 +79,13 @@ def BaselineGraph(prefix, segmentation, seg2gold_mapping):
 
 
 @jit(nopython=True)
-def TraverseIndividualEndpoint(segmentation, center, vector, resolution, max_label, maximum_distance):    
+def TraverseIndividualEndpoint(segmentation, center, vector, resolution, max_label, maximum_distance):
     # the maximum degrees is a function of how the endpoint vectors are generated
     # the vectors have at best this resolution accuracy
     maximum_radians = 0.3216
     # save computation time by calculating cos(theta) here
     cos_theta = math.cos(maximum_radians)
-    
+
     # decompress important variables
     zpoint, ypoint, xpoint = center
     zradius, yradius, xradius = (int(maximum_distance / resolution[IB_Z]), int(maximum_distance / resolution[IB_Y]), int(maximum_distance / resolution[IB_X]))
@@ -116,7 +116,7 @@ def TraverseIndividualEndpoint(segmentation, center, vector, resolution, max_lab
                 if ix < 0 or ix > xres - 1: continue
                 # get the  label for this location
                 voxel_label = segmentation[iz,iy,ix]
-                
+
                 # skip over extracellular/unlabeled material
                 if not voxel_label: continue
 
@@ -157,11 +157,11 @@ def TraverseIndividualEndpoint(segmentation, center, vector, resolution, max_lab
                         xmeans[index] += (ix + 0.5)
                         counts[index] += 1
 
-                
+
                 # skip points that belong to the same label
-                # needs to be after adjacency lookup 
+                # needs to be after adjacency lookup
                 if voxel_label in labels_to_ignore: continue
-                
+
                 # find the distance between the center location and this one and skip if it is too far
                 zdiff = resolution[IB_Z] * (iz - zpoint)
                 ydiff = resolution[IB_Y] * (iy - ypoint)
@@ -196,7 +196,7 @@ def TraverseIndividualEndpoint(segmentation, center, vector, resolution, max_lab
 
         # return the mean as integer values and continue
         means.append((int(zmeans[neighbor_label] / counts[neighbor_label]), int(ymeans[neighbor_label] / counts[neighbor_label]), int(xmeans[neighbor_label] / counts[neighbor_label])))
-                
+
     return neighbors, means
 
 
@@ -242,20 +242,20 @@ def GenerateEdges(prefix, segmentation, subset, seg2gold_mapping=None):
     network_radius = 600
     maximum_distance = 500
     width = (18, 52, 52)
-    
+
     # create the directory structure to save the features in
     # forward is needed for training and validation data that is cropped
     CreateDirectoryStructure(width, network_radius, ['training', 'validation', 'testing', 'forward'], 'edges')
 
     # get the size of the data
     zres, yres, xres = segmentation.shape
-    
+
     # make sure the subset is one of three categories
     assert (subset == 'training' or subset == 'validation' or subset == 'testing')
 
     # crop the subset if it overlaps with testing data
     ((cropped_zmin, cropped_zmax), (cropped_ymin, cropped_ymax), (cropped_xmin, cropped_xmax)) = dataIO.CroppingBox(prefix)
-    
+
     # call the function to actually generate the edges
     edges = EndpointTraversal(prefix, segmentation, maximum_distance)
 
@@ -271,7 +271,7 @@ def GenerateEdges(prefix, segmentation, subset, seg2gold_mapping=None):
         zpoint, ypoint, xpoint = (edge[IB_Z], edge[IB_Y], edge[IB_X])
         label_one, label_two = edge[3], edge[4]
 
-        # if the center of the point falls outside the cropped box do not include it in training or validation 
+        # if the center of the point falls outside the cropped box do not include it in training or validation
         forward = False
         # however, you allow it for forward inference
         if (zpoint < cropped_zmin or cropped_zmax <= zpoint): forward = True
@@ -282,30 +282,30 @@ def GenerateEdges(prefix, segmentation, subset, seg2gold_mapping=None):
         if not seg2gold_mapping is None:
             gold_one = seg2gold_mapping[label_one]
             gold_two = seg2gold_mapping[label_two]
-        else: 
+        else:
             gold_one = -1
             gold_two = -1
 
         # create lists of locations where these point occur
         if forward:
-            if gold_one < 1 or gold_two < 1: 
+            if gold_one < 1 or gold_two < 1:
                 forward_unknown_examples.append(edge)
             elif gold_one == gold_two:
                 forward_positive_examples.append(edge)
-            else: 
+            else:
                 forward_negative_examples.append(edge)
         else:
-            if gold_one < 1 or gold_two < 1: 
+            if gold_one < 1 or gold_two < 1:
                 unknown_examples.append(edge)
             elif gold_one == gold_two:
                 positive_examples.append(edge)
             else:
                 negative_examples.append(edge)
 
-    print 'No. Positive Edges: {}'.format(len(positive_examples))
-    print 'No. Negative Edges: {}'.format(len(negative_examples))
-    print 'No. Unknown Edges: {}'.format(len(unknown_examples))
-                
+    print ('No. Positive Edges: {}'.format(len(positive_examples)))
+    print ('No. Negative Edges: {}'.format(len(negative_examples)))
+    print ('No. Unknown Edges: {}'.format(len(unknown_examples)))
+
     parent_directory = 'features/biological/edges-{}nm-{}x{}x{}'.format(network_radius, width[IB_Z], width[IB_Y], width[IB_X])
 
     if len(positive_examples):
@@ -366,7 +366,7 @@ def GenerateEdges(prefix, segmentation, subset, seg2gold_mapping=None):
             fd.write(struct.pack('q', len(forward_positive_examples)))
             for example in forward_positive_examples:
                 fd.write(struct.pack('qqqqqq', example[0], example[1], example[2], example[3], example[4], example[5]))
-        
+
         # create new examples array to remove last element
         examples = []
         for example in forward_positive_examples:
@@ -374,7 +374,7 @@ def GenerateEdges(prefix, segmentation, subset, seg2gold_mapping=None):
 
         forward_positive_examples_array = GenerateExamplesArray(prefix, segmentation, examples, width, network_radius)
         dataIO.WriteH5File(forward_positive_examples_array, '{}/forward/positives/{}-examples.h5'.format(parent_directory, prefix), 'main', compression=True)
-        del forward_positive_examples_array            
+        del forward_positive_examples_array
 
     if len(forward_negative_examples):
         # save the examples

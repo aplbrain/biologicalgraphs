@@ -8,7 +8,7 @@ import struct
 
 
 def Agglomerate(prefix, model_prefix, threshold=0.5):
-    # read the segmentation data 
+    # read the segmentation data
     segmentation = dataIO.ReadSegmentationData(prefix)
 
     # get the multicut filename (with graph weights)
@@ -62,20 +62,20 @@ def Agglomerate(prefix, model_prefix, threshold=0.5):
 
     import time
     start_time = time.time()
-    print 'Agglomeration - {}:'.format(threshold)
-    # create the command line 
+    print ('Agglomeration - {}:'.format(threshold))
+    # create the command line
     command = '~/software/PixelPred2Seg/comparestacks --stack1 {} --stackbase {} --dilate1 1 --dilatebase 1 --relabel1 --relabelbase --filtersize 100 --anisotropic'.format(agglomeration_filename, gold_filename)
 
     # execute the command
     os.system(command)
-    print time.time() - start_time
+    print (time.time() - start_time)
 
 
 
 def MergeGroundTruth(prefix, model_prefix):
     # read the segmentation data
     segmentation = dataIO.ReadSegmentationData(prefix)
-    
+
     # get the multicut filename (with graph weights)
     multicut_filename = 'multicut/{}-{}.graph'.format(model_prefix, prefix)
 
@@ -91,7 +91,7 @@ def MergeGroundTruth(prefix, model_prefix):
     # create union find data structure
     union_find = [UnionFind.UnionFindElement(iv) for iv in range(max_value)]
 
-    # read in all of the labels 
+    # read in all of the labels
     with open(multicut_filename, 'rb') as fd:
         # read the number of vertices and edges
         nvertices, nedges, = struct.unpack('QQ', fd.read(16))
@@ -111,7 +111,7 @@ def MergeGroundTruth(prefix, model_prefix):
     # create a mapping
     mapping = np.zeros(max_value, dtype=np.int64)
 
-    # update the segmentation 
+    # update the segmentation
     for iv in range(max_value):
         label = UnionFind.Find(union_find[iv]).label
 
@@ -129,10 +129,10 @@ def MergeGroundTruth(prefix, model_prefix):
 
     import time
     start_time = time.time()
-    print 'Ground truth: '
-    # create the command line 
+    print ('Ground truth: ')
+    # create the command line
     command = '~/software/PixelPred2Seg/comparestacks --stack1 {} --stackbase {} --dilate1 1 --dilatebase 1 --relabel1 --relabelbase --filtersize 100 --anisotropic'.format(truth_filename, gold_filename)
 
     # execute the command
     os.system(command)
-    print time.time() - start_time
+    print (time.time() - start_time)

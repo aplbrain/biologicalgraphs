@@ -41,10 +41,10 @@ def PrintResults(prefix, vertex_ones, vertex_twos, edge_weights, maintained_edge
         if seg2gold_mapping[vertex_one] == seg2gold_mapping[vertex_two]: labels.append(True)
         else: labels.append(False)
 
-    print 'CNN Results:'
+    print ('CNN Results:')
     PrecisionAndRecall(np.array(labels), np.array(cnn_results))
 
-    print 'Multicut Results'
+    print ('Multicut Results')
     PrecisionAndRecall(np.array(labels), np.array(multicut_results))
 
 
@@ -112,13 +112,13 @@ def CollapseGraph(prefix, segmentation, vertex_ones, vertex_twos, maintained_edg
 
         rand_error, vi = comparestacks.VariationOfInformation(new_prefix, segmentation, gold)
 
-        print 'Rand Error Full: {}'.format(rand_error[0] + rand_error[1])
-        print 'Rand Error Merge: {}'.format(rand_error[0])
-        print 'Rand Error Split: {}'.format(rand_error[1])
+        print ('Rand Error Full: {}'.format(rand_error[0] + rand_error[1]))
+        print ('Rand Error Merge: {}'.format(rand_error[0])
+        print ('Rand Error Split: {}'.format(rand_error[1])
 
-        print 'Variation of Information Full: {}'.format(vi[0] + vi[1])
-        print 'Variation of Information Merge: {}'.format(vi[0])
-        print 'Variation of Information Split: {}'.format(vi[1])
+        print ('Variation of Information Full: {}'.format(vi[0] + vi[1]))
+        print ('Variation of Information Merge: {}'.format(vi[0]))
+        print ('Variation of Information Split: {}'.format(vi[1]))
 
         if not os.path.exists('results'): os.mkdir('results')
         with open('results/{}-{}.txt'.format(prefix, algorithm), 'w') as fd:

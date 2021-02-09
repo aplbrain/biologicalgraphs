@@ -150,12 +150,12 @@ def WriteLogFiles(model, model_prefix, parameters):
 
     with open(logfile, 'w') as fd:
         for layer in model.layers:
-            print '{} {} -> {}'.format(layer.get_config()['name'], layer.input_shape, layer.output_shape)
+            print ('{} {} -> {}'.format(layer.get_config()['name'], layer.input_shape, layer.output_shape))
             fd.write('{} {} -> {}\n'.format(layer.get_config()['name'], layer.input_shape, layer.output_shape))
-        print
+        print ()
         fd.write('\n')
         for parameter in parameters:
-            print '{}: {}'.format(parameter, parameters[parameter])
+            print ('{}: {}'.format(parameter, parameters[parameter]))
             fd.write('{}: {}\n'.format(parameter, parameters[parameter]))
 
 

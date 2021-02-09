@@ -20,14 +20,14 @@ def PrecisionAndRecallCurve(ground_truth, probabilities):
     precisions, recalls, _ = precision_recall_curve(ground_truth, probabilities)
     return precisions, recalls, average_precision_score(ground_truth, probabilities)
 
-    
+
 
 def ReceiverOperatingCharacteristicCurve(ground_truth, probabilities):
     false_positive_rates, true_positive_rates, _ = roc_curve(ground_truth, probabilities)
     return false_positive_rates, true_positive_rates, auc(false_positive_rates, true_positive_rates)
-    
-    
-    
+
+
+
 def PrecisionAndRecall(ground_truth, predictions, output_filename=None, binary=True):
     assert (ground_truth.shape == predictions.shape)
 
@@ -48,7 +48,7 @@ def PrecisionAndRecall(ground_truth, predictions, output_filename=None, binary=T
         elif not label and prediction: FP += 1
         elif label and not prediction: FN += 1
         else: TN += 1
-    
+
     # format the output string
     output_string = 'Positive Examples: {}\n'.format(TP + FN)
     output_string += 'Negative Examples: {}\n\n'.format(FP + TN)
@@ -67,7 +67,7 @@ def PrecisionAndRecall(ground_truth, predictions, output_filename=None, binary=T
     output_string += 'Accuracy: {}'.format(float(TP + TN) / float(TP + FP + FN + TN))
 
     # output the string to the output file and standard out
-    print output_string
+    print (output_string)
     if not output_filename == None:
         with open(output_filename, 'w') as fd:
             fd.write(output_string)
