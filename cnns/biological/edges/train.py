@@ -30,7 +30,7 @@ def ConvolutionalLayer(model, filter_size, kernel_size, padding, activation, nor
     if activation == 'LeakyReLU': model.add(LeakyReLU(alpha=0.001))
     elif activation == 'ELU': model.add(ELU())
     else: model.add(Activation(activation))
-    
+
     # add normalization after activation
     if normalization: model.add(BatchNormalization())
 
@@ -79,9 +79,9 @@ class PlotLosses(keras.callbacks.Callback):
         self.x = []
         self.losses = []
         self.val_losses = []
-        
+
         self.fig = plt.figure()
-        
+
         self.logs = []
 
     def on_epoch_end(self, epoch, logs={}):
@@ -90,7 +90,7 @@ class PlotLosses(keras.callbacks.Callback):
         self.losses.append(logs.get('loss'))
         self.val_losses.append(logs.get('val_loss'))
         self.i = self.i + 1
-        
+
         plt.ylabel('Training/Validation Loss')
         plt.xlabel('Number of Epochs')
         plt.plot(self.x, self.losses, label="loss")
@@ -142,7 +142,7 @@ def EdgeNetwork(parameters, width):
     if optimizer == 'adam': opt = Adam(lr=initial_learning_rate, decay=decay_rate, beta_1=betas[0], beta_2=betas[1], epsilon=1e-08)
     elif optimizer == 'nesterov': opt = SGD(lr=initial_learning_rate, decay=decay_rate, momentum=0.99, nesterov=True)
     model.compile(loss=loss_function, optimizer=opt, metrics=['accuracy'])
-    
+
     return model
 
 
@@ -155,7 +155,7 @@ def WriteLogFiles(model, model_prefix, parameters):
         for layer in model.layers:
             print '{} {} -> {}'.format(layer.get_config()['name'], layer.input_shape, layer.output_shape)
             fd.write('{} {} -> {}\n'.format(layer.get_config()['name'], layer.input_shape, layer.output_shape))
-        print 
+        print
         fd.write('\n')
         for parameter in parameters:
             print '{}: {}'.format(parameter, parameters[parameter])
@@ -177,7 +177,7 @@ def EdgeGenerator(parameters, width, radius, subset):
     positive_candidates = np.concatenate(positive_candidates, axis=0)
 
     # get all the negative candidate filenames
-    negative_filenames = os.listdir(negative_directory) 
+    negative_filenames = os.listdir(negative_directory)
     negative_candidates = []
     for negative_filename in negative_filenames:
         if not negative_filename[-3:] == '.h5': continue
@@ -203,7 +203,7 @@ def EdgeGenerator(parameters, width, radius, subset):
     negative_index = 0
 
     while True:
-        for iv in range(batch_size / 2):
+        for iv in range(batch_size // 2):
             positive_candidate = positive_candidates[positive_order[positive_index]]
             negative_candidate = negative_candidates[negative_order[negative_index]]
 
@@ -256,7 +256,7 @@ def Train(parameters, model_prefix, width, radius):
 
     # create a set of keras callbacks
     callbacks = []
-    
+
     # save the best model seen so far
     best_loss = keras.callbacks.ModelCheckpoint('{}-best-loss.h5'.format(model_prefix), monitor='val_loss', verbose=0, save_best_only=True, save_weights_only=True, mode='auto', period=1)
     callbacks.append(best_loss)
@@ -268,11 +268,11 @@ def Train(parameters, model_prefix, width, radius):
     # plot the loss functions
     plot_losses = PlotLosses(model_prefix)
     callbacks.append(plot_losses)
-   
+
     # save the json file
     json_string = model.to_json()
     open('{}.json'.format(model_prefix), 'w').write(json_string)
-    
+
     if starting_epoch:
         model.load_weights('{}-{:03d}.h5'.format(model_prefix, starting_epoch))
 
@@ -280,10 +280,10 @@ def Train(parameters, model_prefix, width, radius):
     nvalidation_examples = 2000
 
     # train the model
-    history = model.fit_generator(EdgeGenerator(parameters, width, radius, 'training'), steps_per_epoch=(examples_per_epoch / batch_size), 
-        epochs=2000, verbose=2, class_weight=weights, callbacks=callbacks, validation_data=EdgeGenerator(parameters, width, radius, 'validation'), 
-                                  validation_steps=(nvalidation_examples / batch_size), initial_epoch=starting_epoch)
-    
+    history = model.fit_generator(EdgeGenerator(parameters, width, radius, 'training'), steps_per_epoch=(examples_per_epoch // batch_size),
+        epochs=2000, verbose=2, class_weight=weights, callbacks=callbacks, validation_data=EdgeGenerator(parameters, width, radius, 'validation'),
+                                  validation_steps=(nvalidation_examples // batch_size), initial_epoch=starting_epoch)
+
     with open('{}-history.pickle'.format(model_prefix), 'w') as fd:
         pickle.dump(history.history, fd)
 

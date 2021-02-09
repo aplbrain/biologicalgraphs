@@ -30,18 +30,18 @@ class Skeleton:
         self.grid_size = grid_size
         self.resolution = resolution
         self.joints = []
-        self.endpoints = []        
+        self.endpoints = []
 
         for joint in joints:
-            iz = joint / (grid_size[IB_Y] * grid_size[IB_X])
-            iy = (joint - iz * grid_size[IB_Y] * grid_size[IB_X]) / grid_size[IB_X]
+            iz = joint // (grid_size[IB_Y] * grid_size[IB_X])
+            iy = (joint - iz * grid_size[IB_Y] * grid_size[IB_X]) // grid_size[IB_X]
             ix = joint % grid_size[IB_X]
 
             self.joints.append(Joint(joint, iz, iy, ix))
 
         for endpoint in endpoints:
-            iz = endpoint / (grid_size[IB_Y] * grid_size[IB_X])
-            iy = (endpoint - iz * grid_size[IB_Y] * grid_size[IB_X]) / grid_size[IB_X]
+            iz = endpoint // (grid_size[IB_Y] * grid_size[IB_X])
+            iy = (endpoint - iz * grid_size[IB_Y] * grid_size[IB_X]) // grid_size[IB_X]
             ix = endpoint % grid_size[IB_X]
 
             vector = vectors[endpoint]
