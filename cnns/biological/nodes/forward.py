@@ -23,9 +23,15 @@ from biologicalgraphs.evaluation import comparestacks
 def NodeGenerator(examples, width):
     index = 0
 
+    import time 
+    start_time = time.time()
+
     while True:
         # prevent overflow of the queue (these examples will not go through)
         if index == examples.shape[0]: index = 0
+
+        if not index % 1000:
+            print ('Completed {}/{} in {:0.2f} seconds'.format(index, len(examples), time.time() - start_time))
 
         # augment the feature
         example = AugmentFeature(examples[index], width)

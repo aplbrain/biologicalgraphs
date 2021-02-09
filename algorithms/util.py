@@ -113,8 +113,8 @@ def CollapseGraph(prefix, segmentation, vertex_ones, vertex_twos, maintained_edg
         rand_error, vi = comparestacks.VariationOfInformation(new_prefix, segmentation, gold)
 
         print ('Rand Error Full: {}'.format(rand_error[0] + rand_error[1]))
-        print ('Rand Error Merge: {}'.format(rand_error[0])
-        print ('Rand Error Split: {}'.format(rand_error[1])
+        print ('Rand Error Merge: {}'.format(rand_error[0]))
+        print ('Rand Error Split: {}'.format(rand_error[1]))
 
         print ('Variation of Information Full: {}'.format(vi[0] + vi[1]))
         print ('Variation of Information Merge: {}'.format(vi[0]))

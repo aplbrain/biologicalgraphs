@@ -1,2 +1,2 @@
-from train import Train
-from forward import Forward
+from .train import Train
+from .forward import Forward
