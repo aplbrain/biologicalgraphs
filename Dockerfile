@@ -1,26 +1,28 @@
 FROM tensorflow/tensorflow:latest-gpu
 WORKDIR /home
-ADD . /home/biologicalgraphs
 
-RUN apt-get update && apt-get upgrade -y && apt-get install \ 
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \ 
 git \
-build-essentials \
+build-essential \
 lsb-release \
 wget \
 software-properties-common \
 libcairo2-dev \
 pkg-config
 
-RUN wget -O - https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 10
+RUN wget -O llvm.sh https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 10
 ENV LLVM_CONFIG /usr/lob/llvm-10/bin/llvm-config
-RUN pip install -r requirements.txt
+ADD requirements.txt /home/biologicalgraphs/
+RUN pip install -r /home/biologicalgraphs/requirements.txt
 
-# RUN git clone https://github.com/bjoern-andres/graph.git
-# RUN pip install -r /home/biologicalgraphs/requirements.txt
-# WORKDIR /home/biologicalgraphs
-# RUN python algorithms/setup.py build_ext --inplace
-# RUN python evaluation/setup.py build_ext --inplace
-# RUN python biological/setup.py build_ext --inplace
-# RUN python skeletonization/setup.py build_ext --inplace
+WORKDIR /home/biologicalgraphs
 
-# RUN python transforms/setup.py build_ext --inplace
+ADD . /home/biologicalgraphs/
+WORKDIR /home/biologicalgraphs/include/
+RUN git clone https://github.com/bjoern-andres/graph.git
+RUN cd /home/biologicalgraphs/algorithms && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/evaluation && python setup.py build_ext 
+RUN cd /home/biologicalgraphs/graphs/biological && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/skeletonization && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/transforms && python setup.py build_ext --inplace

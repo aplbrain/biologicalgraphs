@@ -8,21 +8,21 @@ extensions = [
     Extension(
         name='distance',
         include_dirs=[np.get_include()],
-        sources=[currdir/'distance.pyx', currdir/'cpp-distance.cpp'],
+        sources=[str(currdir/'distance.pyx'), str(currdir/'cpp-distance.cpp')],
         extra_compile_args=['-O4', '-std=c++0x'],
         language='c++'
     ),
     Extension(
         name='seg2gold',
         include_dirs=[np.get_include()],
-        sources=[currdir/'seg2gold.pyx', currdir/'cpp-seg2gold.cpp'],
+        sources=[str(currdir/'seg2gold.pyx'), str(currdir/'cpp-seg2gold.cpp')],
         extra_compile_args=['-O4', '-std=c++0x'],
         language='c++'
     ),
     Extension(
         name='seg2seg',
         include_dirs=[np.get_include()],
-        sources=[currdir/'seg2seg.pyx', currdir/'cpp-seg2seg.cpp'],
+        sources=[str(currdir/'seg2seg.pyx'), str(currdir/'cpp-seg2seg.cpp')],
         extra_compile_args=['-O4', '-std=c++0x'],
         language='c++'
     )
