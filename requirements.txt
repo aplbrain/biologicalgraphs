@@ -51,9 +51,5 @@ singledispatch
 sip
 six
 
-
-tf-nightly
-theano
-
 werkzeug
 

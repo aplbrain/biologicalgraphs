@@ -157,7 +157,7 @@ def Forward(prefix, model_prefix, subset):
     assert (len(edges) == examples.shape[0])
     
     # get all of the probabilities 
-    probabilities = model.predict_generator(EdgeGenerator(examples, width), examples.shape[0], max_q_size=1000)
+    probabilities = model.predict(EdgeGenerator(examples, width), examples.shape[0], max_queue_size=1000)
 
     # create the correct labels for the ground truth
     ground_truth = np.zeros(npositives + nnegatives, dtype=np.bool)

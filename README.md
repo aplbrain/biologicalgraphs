@@ -7,31 +7,11 @@ The code repository for the 2019 CVPR paper *Biologically-Constrained Graphs for
 This code requires the C++ Graph library from Bjoern Andres: http://www.andres.sc/graph.html [2, 3]. This package should not require additional packages or installation as all functions are included in header files.
 
 ### Installation
+You can install by creating a docker container with:
+```
+docker build -t biologicalgraphs .
+```
 
-````
-git clone https://github.com/Rhoana/biologicalgraphs.git .
-cd biologicalgraphs
-conda create -n biographs_env python=2.7
-source activate biographs_env
-conda install --file requirements.txt
-````
-
-Change the variable `graph_software_dir` in `algorithms/setup.py` to be the parent directory where you installed the Andres graph repository.
-
-```` 
-cd algorithms
-python setup.py build_ext --inplace
-cd ../evaluation
-python setup.py build_ext --inplace
-cd ../graphs/biological
-python setup.py build_ext --inplace
-cd ../../skeletonization
-python setup.py build_ext --inplace
-cd ../transforms
-python setup.py build_ext --inplace
-````
-
-Add the parent directory to this repository to your PYTHONPATH variable. 
 
 ### Meta Files
 
