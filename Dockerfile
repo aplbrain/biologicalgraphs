@@ -19,10 +19,12 @@ RUN pip install -r /home/biologicalgraphs/requirements.txt
 WORKDIR /home/biologicalgraphs
 
 ADD . /home/biologicalgraphs/
-WORKDIR /home/biologicalgraphs/include/
+WORKDIR /home/biologicalgraphs/biologicalgraphs/include/
 RUN git clone https://github.com/bjoern-andres/graph.git
-RUN cd /home/biologicalgraphs/algorithms && python setup.py build_ext --inplace
-RUN cd /home/biologicalgraphs/evaluation && python setup.py build_ext 
-RUN cd /home/biologicalgraphs/graphs/biological && python setup.py build_ext --inplace
-RUN cd /home/biologicalgraphs/skeletonization && python setup.py build_ext --inplace
-RUN cd /home/biologicalgraphs/transforms && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/biologicalgraphs/algorithms && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/biologicalgraphs/evaluation && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/biologicalgraphs/graphs/biological && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/biologicalgraphs/skeletonization && python setup.py build_ext --inplace
+RUN cd /home/biologicalgraphs/biologicalgraphs/transforms && python setup.py build_ext --inplace
+WORKDIR /home/biologicalgraphs/
+RUN pip install -e .
