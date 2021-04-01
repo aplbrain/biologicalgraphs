@@ -24,8 +24,8 @@ print('Shape of cutout:', np.shape(cutout))
 
 # Create metadata file
 pinky_meta = open("../Pinky-test.meta", "w")
-file.write("# resolution in nm\n 6x6x30\n  # segmentation filename\n segmentations/Pinky-test-segmentation.h5 main\n # grid size\n 1336x1809x20")
-file.close() 
+pinky_meta.write("# resolution in nm\n 6x6x30\n  # segmentation filename\n segmentations/Pinky-test-segmentation.h5 main\n # grid size\n 1336x1809x20")
+pinky_meta.close() 
 
 # Convert boss data to h5 for pipeline
 print('Converting to h5... \n')
