@@ -62,6 +62,14 @@ def WriteH5File(data, filename, dataset, compression=True):
 
 
 
+def WriteBossH5File(array, cutout, prefix):
+    h5_filename = '../neuronseg/segmentations/{}-{}-segmentation.h5'.format(array.experiment_name, prefix)
+    seg = h5py.File(h5_filename, 'w')
+    seg.create_dataset('main', data=cutout)
+    seg.close()
+
+
+
 def ReadAffinityData(prefix):
     filename, dataset = meta_data.MetaData(prefix).AffinityFilename()
 

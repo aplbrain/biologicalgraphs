@@ -114,3 +114,24 @@ class MetaData:
                 # need to call the function here so that we get the grid size if there was non in the original meta file
                 (crop_zmin, crop_zmax), (crop_ymin, crop_ymax), (crop_xmin, crop_xmax) = self.CroppingBox()
                 fd.write('{}:{}x{}:{}x{}:{}\n'.format(crop_xmin, crop_xmax, crop_ymin, crop_ymax, crop_zmin, crop_zmax))
+
+def WriteBossMetaFile(array, cutout, prefix):
+    
+    meta_filename = '../neuronseg/meta/{}-{}.meta'.format(array.experiment_name, prefix)
+
+    with open(meta_filename, 'w') as fd:
+        # write the resolution in x, y, z order
+        fd.write('# resolution in nm\n')
+        fd.write('{}x{}x{}\n'.format(array.voxel_size[0][2], array.voxel_size[0][1], array.voxel_size[0][0]))
+        
+        # code snippet in case res must be ints instead of floats
+        res_int = tuple(map(int, array.voxel_size[0])) 
+
+        fd.write('# segmentation filename\n')
+        fd.write('{}-{}-segmentation.h5 main\n'.format(array.experiment_name, prefix))
+
+        # write the grid size in x, y, z order
+        fd.write('# grid size\n')
+        fd.write('{}x{}x{}\n'.format(cutout.shape[2], cutout.shape[1], cutout.shape[0]))
+
+        fd.close()

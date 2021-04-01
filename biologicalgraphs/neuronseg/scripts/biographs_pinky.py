@@ -5,10 +5,17 @@ from biologicalgraphs.cnns.biological import edges, nodes
 from biologicalgraphs.transforms import seg2seg, seg2gold
 from biologicalgraphs.skeletonization import generate_skeletons
 from biologicalgraphs.algorithms import lifted_multicut
+from biologicalgraphs.data_structures import meta_data
 import h5py
 import numpy as np
 from intern.remote.boss import BossRemote
 from intern import array
+
+# the prefix name corresponds to the meta file in meta/{PREFIX}.meta
+prefix = 'test'
+
+# subset is either training, validation, or testing
+subset = 'testing'
 
 # Configure intern
 config = {"protocol": "https",
@@ -23,48 +30,30 @@ print('Cutout complete. \n')
 print('Shape of cutout:', np.shape(cutout))
 
 # Create metadata file
-pinky_meta = open("../Pinky-test.meta", "w")
-pinky_meta.write("# resolution in nm\n 6x6x30\n  # segmentation filename\n segmentations/Pinky-test-segmentation.h5 main\n # grid size\n 1336x1809x20")
-pinky_meta.close() 
+print('Creating metadata.. \n')
+meta_data.WriteBossMetaFile(boss_data, cutout, prefix)
+print('Metadata created. \n')
 
 # Convert boss data to h5 for pipeline
 print('Converting to h5... \n')
-filename = '../segmentations/Pinky-test-segmentation.h5'
-seg = h5py.File(filename, 'w')
-h5data = seg.create_dataset('main', data=cutout)
-seg.close()
+dataIO.WriteBossH5File(boss_data, cutout, prefix)
 print('h5 created. \n')
 
-# the prefix name corresponds to the meta file in meta/{PREFIX}.meta
-prefix = 'Pinky-test'
-
-# subset is either training, validation, or testing
-subset = 'testing'
-
 # read the input segmentation data
-print('Reading segmentation data \n')
 segmentation = dataIO.ReadSegmentationData(prefix)
-print('Segmentation data loaded \n')
 
 # remove the singleton slices
-print('Removing singletons \n')
 node_generation.RemoveSingletons(prefix, segmentation)
-print('Removed singletons \n')
 
 # need to update the prefix and segmentation
 # removesingletons writes a new h5 file to disk
-print('Reading segmentation wos \n')
 prefix = '{}-segmentation-wos'.format(prefix)
 segmentation = dataIO.ReadSegmentationData(prefix)
-print('Segmentation wos loaded \n')
 
 # generate locations for segments that are too small
-print('Generating nodes- segments that are too small \n')
 node_generation.GenerateNodes(prefix, segmentation, subset)
-print('Finished generating nodes \n')
 
 # run inference for node network
-print('')
 node_model_prefix = 'architectures/nodes-400nm-3x20x60x60-Kasthuri/nodes'
 nodes.forward.Forward(prefix, node_model_prefix, segmentation, subset, evaluate=False)
 
