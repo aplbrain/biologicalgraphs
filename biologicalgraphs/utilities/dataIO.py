@@ -62,7 +62,7 @@ def WriteH5File(data, filename, dataset, compression=True):
 
 
 
-def WriteBossH5File(array, cutout, prefix):
+def WriteBossH5File(cutout, prefix):
     h5_filename = '../neuronseg/segmentations/{}-{}-segmentation.h5'.format(array.experiment_name, prefix)
     seg = h5py.File(h5_filename, 'w')
     seg.create_dataset('main', data=cutout)
