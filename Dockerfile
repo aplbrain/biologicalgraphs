@@ -9,7 +9,8 @@ lsb-release \
 wget \
 software-properties-common \
 libcairo2-dev \
-pkg-config
+pkg-config \
+vim
 
 RUN wget -O llvm.sh https://apt.llvm.org/llvm.sh && chmod +x llvm.sh && ./llvm.sh 10
 ENV LLVM_CONFIG /usr/lob/llvm-10/bin/llvm-config

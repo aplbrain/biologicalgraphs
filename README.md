@@ -12,6 +12,12 @@ You can install by creating a docker container with:
 docker build -t biologicalgraphs .
 ```
 
+### Deployment
+You can run the docker container in an interactive terminal with gpu support:
+```
+docker run --gpus all --rm -it biologicalgraphs /bin/bash
+```
+This will remove the docker container once the terminal session finishes.
 
 ### Meta Files
 
