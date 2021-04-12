@@ -5,6 +5,7 @@ from biologicalgraphs.cnns.biological import edges, nodes
 from biologicalgraphs.transforms import seg2seg, seg2gold
 from biologicalgraphs.skeletonization import generate_skeletons
 from biologicalgraphs.algorithms import lifted_multicut
+from biologicalgraphs.data_structures import meta_data
 import argparse
 import configparser
 import os

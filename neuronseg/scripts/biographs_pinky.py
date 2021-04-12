@@ -25,6 +25,8 @@ rmt = BossRemote(config)
 
 # Get data from bossdb
 boss_data = array("bossdb://microns/pinky100_8x8x40/segmentation")
+if boss_data.dtype != 'uint64':
+    raise TypeError('Please choose an annotation channel for this pipeline.')
 cutout = boss_data[1000:1020, 20000:21809, 30000:31336]
 print('Cutout complete. \n')
 print('Shape of cutout:', np.shape(cutout))
