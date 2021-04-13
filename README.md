@@ -33,13 +33,6 @@ python setup.py build_ext --inplace
 
 Add the parent directory to this repository to your PYTHONPATH variable.
 
-### Deployment
-You can run the docker container in an interactive terminal with gpu support:
-```
-docker run --gpus all --rm -it biologicalgraphs /bin/bash
-```
-This will remove the docker container once the terminal session finishes.
-
 ### Meta Files
 
 Each new dataset needs a meta file named meta/{PREFIX}.meta where {PREFIX} is a unique identifier for the dataset. All functions in this repository require as input this {PREFIX} identifier to find the locations for the requisite datasets (i.e., image, affinities, segmentation, etc.). An example meta file is provided in `neuronseg/meta/Kasthuri-test.meta`. This file contains all of the necessary dataset references. 
@@ -48,10 +41,25 @@ Each new dataset needs a meta file named meta/{PREFIX}.meta where {PREFIX} is a 
 
 This python package assumes a certain directory structure. Call the parent directory `{PARENT_DIR}`. All input segmentations should reside in `{PARENT_DIR}/segmentations`. All meta files must be saved in `{PARENT_DIR}/meta`. 
 
-### Example Script
+### Example Script (Biologically-Constrained Graphs)
 
-There is an example script to run the complete framework in the `neuronseg/scripts` folder. This script runs the entire framework on the testing portion of the Kasthuri dataset [4]. The ground truth for this dataset is in `neuronseg/golds` and our input segmentations are in `neuronseg/segmentations`. The meta file `neuronseg/meta/Kasthuri-test.meta` contains the relevant links and can act as a guide for future datasets. The network architectures used for the results in the paper are included in the subdirectories in `neuronseg/architectures`. 
+There is an example script to run the complete framework: `neuronseg/scripts/biographs_legacy.py`. This script runs the entire framework on the testing portion of the Kasthuri dataset [4]. The ground truth for this dataset is in `neuronseg/golds` and our input segmentations are in `neuronseg/segmentations`. The meta file `neuronseg/meta/Kasthuri-test.meta` contains the relevant links and can act as a guide for future datasets. The network architectures used for the results in the paper are included in the subdirectories in `neuronseg/architectures`. 
 
+### Script Using Data from BossDB
+
+There is a script: `neuronseg/scripts/biographs.py` that allows you to run this error correction tool on data from the Block & Object Storage System (BossDB). For more information about BossDB please visit <bossdb.org>.
+
+#### Usage
+
+```bash
+python biographs.py (-c CONFIG | -t TOKEN) --coll COLL --exp EXP --chan CHAN [--res RES] [--xmin XMIN][--xmax XMAX] [--ymin YMIN] [--ymax YMAX] [--zmin ZMIN] [--zmax ZMAX]
+```
+
+#### Example
+
+```bash
+python biographs.py -t public --coll microns --exp pinky100_8x8x40 --chan segmentation --res 0 --xmin 31314 --xmax 32650 --ymin 19500 --ymax 21309 --zmin 1115 --zmax 1125
+```
 
 ### Citations
     
