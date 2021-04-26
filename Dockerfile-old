@@ -1,0 +1,35 @@
+FROM tensorflow/tensorflow:latest-gpu
+
+WORKDIR /app
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y git wget vim build-essential
+
+# Install anaconda
+RUN wget https://repo.anaconda.com/archive/Anaconda3-5.0.1-Linux-x86_64.sh
+RUN bash Anaconda3-5.0.1-Linux-x86_64.sh -b 
+ENV PATH "/root/anaconda3/bin:$PATH"
+RUN rm Anaconda3-5.0.1-Linux-x86_64.sh
+
+# Create the environment:
+COPY python2-requirements.txt .
+RUN conda create --name biographs_env python=2.7 --file python2-requirements.txt
+RUN conda install -c conda-forge intern
+
+
+# Copies source code
+COPY biologicalgraphs/ /app/biologicalgraphs/
+
+# Installs graph software
+RUN mkdir /app/software/ && cd /app/software/ && git clone https://github.com/bjoern-andres/graph.git
+
+# Build Commands
+RUN cd /app/biologicalgraphs/algorithms && python setup.py build_ext --inplace
+RUN cd /app/biologicalgraphs/evaluation && python setup.py build_ext --inplace
+RUN cd /app/biologicalgraphs/graphs/biological && python setup.py build_ext --inplace
+RUN cd /app/biologicalgraphs/skeletonization && python setup.py build_ext --inplace
+RUN cd /app/biologicalgraphs/transforms && python setup.py build_ext --inplace
+
+# Creates shell for environment
+SHELL ["conda", "run", "-n", "biographs_env", "/bin/bash", "-c"]
+
+WORKDIR /app/biologicalgraphs/
