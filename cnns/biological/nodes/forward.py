@@ -173,7 +173,7 @@ def Forward(prefix, model_prefix, segmentation, subset, seg2gold_mapping=None, e
     small_segments, large_segments = FindSmallSegments(segmentation, threshold)
 
     # get all of the probabilities
-    probabilities = model.predict_generator(NodeGenerator(examples, width), examples.shape[0], max_q_size=1000)
+    probabilities = model.predict(NodeGenerator(examples, width), examples.shape[0], max_queue_size=1000)
 
     # save the probabilities to a file
     output_filename = '{}-{}.probabilities'.format(model_prefix, prefix)

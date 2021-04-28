@@ -1,10 +1,7 @@
 import h5py
 import struct
-
-
+import os
 import numpy as np
-
-
 from biologicalgraphs.data_structures import meta_data, skeleton_points
 from biologicalgraphs.utilities.constants import *
 
@@ -59,6 +56,15 @@ def WriteH5File(data, filename, dataset, compression=True):
         # should cover all cases of affinities/images
         if compression: hf.create_dataset(dataset, data=data, compression='gzip')
         else: hf.create_dataset(dataset, data=data)
+
+
+
+def WriteBossH5File(cutout, prefix):
+    h5_path = os.path.dirname(os.getcwd()) + '/neuronseg/segmentations'
+    h5_filename = '{}/{}-segmentation.h5'.format(h5_path, prefix)
+    seg = h5py.File(h5_filename, 'w')    
+    seg.create_dataset('main', data=cutout)
+    seg.close()
 
 
 

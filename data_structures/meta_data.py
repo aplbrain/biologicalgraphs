@@ -1,5 +1,5 @@
 import sys
-
+import os
 from biologicalgraphs.utilities.constants import *
 
 
@@ -114,3 +114,21 @@ class MetaData:
                 # need to call the function here so that we get the grid size if there was non in the original meta file
                 (crop_zmin, crop_zmax), (crop_ymin, crop_ymax), (crop_xmin, crop_xmax) = self.CroppingBox()
                 fd.write('{}:{}x{}:{}x{}:{}\n'.format(crop_xmin, crop_xmax, crop_ymin, crop_ymax, crop_zmin, crop_zmax))
+
+def WriteBossMetaFile(coord_frame, cutout, prefix):
+    meta_path = os.path.dirname(os.getcwd()) + '/neuronseg/meta'
+    meta_filename = '{}/{}.meta'.format(meta_path, prefix)
+
+    with open(meta_filename, 'w') as fd:
+        # write the resolution in x, y, z order
+        fd.write('# resolution in nm\n')
+        fd.write('{}x{}x{}\n'.format(coord_frame.x_voxel_size, coord_frame.y_voxel_size, coord_frame.z_voxel_size))
+
+        fd.write('# segmentation filename\n')
+        fd.write('{}-{}-segmentation.h5 main\n'.format(prefix))
+
+        # write the grid size in x, y, z order
+        fd.write('# grid size\n')
+        fd.write('{}x{}x{}\n'.format(cutout.shape[2], cutout.shape[1], cutout.shape[0]))
+
+        fd.close()
